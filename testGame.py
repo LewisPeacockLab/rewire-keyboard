@@ -18,51 +18,71 @@ class testGame(object):
         self.KEY_FORCE_COLOR = 150,150,150
         self.KEY_DOWN_COLOR = 40,150,40
         self.KEY_HEIGHT = 0.8*self.SCREEN_HEIGHT
-        self.KEY_WIDTH = 0.2*self.SCREEN_HEIGHT
-        self.KEY_PRESS_WIDTH = 0.05*self.SCREEN_HEIGHT
+        self.KEY_WIDTH = 0.15*self.SCREEN_HEIGHT
+        self.KEY_PRESS_WIDTH = 0.025*self.SCREEN_HEIGHT
 
         # initialize logic
-        self.keydown = False
-        self.force_ratio = 0
+        self.mode = 'switch' # or 'force'
+        self.keydown = [False,False,False,False]
+        self.force_ratio = [0,0,0,0]
+        self.key_down_force_ratio = 0.2
+        self.key_up_force_ratio = 0.15
 
     def check_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1: self.keydown = True
-                elif event.key == pygame.K_ESCAPE: self.quit()
+                if self.mode == 'switch':
+                    if event.key == pygame.K_1: self.keydown[0] = True
+                    if event.key == pygame.K_2: self.keydown[1] = True
+                    if event.key == pygame.K_3: self.keydown[2] = True
+                    if event.key == pygame.K_4: self.keydown[3] = True
+                if event.key == pygame.K_ESCAPE: self.quit()
+                if event.key == pygame.K_s: self.mode = 'switch'
+                if event.key == pygame.K_f: self.mode = 'force'
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_1: self.keydown = False
-        self.force_ratio = max(0,min(.5*(1+self.force_keyboard.get_axis(0)),1))
+                if self.mode == 'switch':
+                    if event.key == pygame.K_1: self.keydown[0] = False
+                    if event.key == pygame.K_2: self.keydown[1] = False
+                    if event.key == pygame.K_3: self.keydown[2] = False
+                    if event.key == pygame.K_4: self.keydown[3] = False
+        for key in range(4):
+            self.force_ratio[key] = max(0,min(.5*(1+self.force_keyboard.get_axis(key)),1))
+            if self.mode == 'force':
+                if not(self.keydown[key]) and (self.force_ratio[key] >= self.key_down_force_ratio):
+                    self.keydown[key] = True
+                if self.keydown[key] and (self.force_ratio[key] <= self.key_up_force_ratio):
+                    self.keydown[key] = False
 
     def run(self):
         while True:
             time_passed = self.clock.tick_busy_loop(self.FRAME_RATE)
             self.check_input()
             self.draw_background()
-            self.draw_key()
+            for key in range(4):
+                self.draw_key(key,0.2*self.SCREEN_WIDTH*(key-1.5))
             pygame.display.flip()
 
-    def draw_key(self):
-        if self.keydown:
+    def draw_key(self,key_num,xpos):
+        if self.keydown[key_num]:
             draw_center_rect(self.screen,
                          self.KEY_WIDTH+self.KEY_PRESS_WIDTH,
                          self.KEY_HEIGHT+self.KEY_PRESS_WIDTH,
                          self.KEY_DOWN_COLOR,
-                         .5*self.SCREEN_WIDTH,
+                         .5*self.SCREEN_WIDTH+xpos,
                          0.5*self.SCREEN_HEIGHT)
         draw_center_rect(self.screen,
                      self.KEY_WIDTH,
                      self.KEY_HEIGHT,
                      self.KEY_BG_COLOR,
-                     .5*self.SCREEN_WIDTH,
+                     .5*self.SCREEN_WIDTH+xpos,
                      0.5*self.SCREEN_HEIGHT)
         draw_bottom_rect(self.screen,
              self.KEY_WIDTH,
-             self.force_ratio*self.KEY_HEIGHT,
+             self.force_ratio[key_num]*self.KEY_HEIGHT,
              self.KEY_FORCE_COLOR,
-             .5*self.SCREEN_WIDTH,
+             .5*self.SCREEN_WIDTH+xpos,
              0.5*self.SCREEN_HEIGHT+0.5*self.KEY_HEIGHT) 
 
     def draw_background(self):
