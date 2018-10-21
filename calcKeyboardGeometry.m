@@ -2,9 +2,9 @@
 % find distance from spring to pivot %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-L1 = 25.4; % distance from spring to finger (mm)
+L1 = 35; %25.4; % distance from spring to finger (mm)
 d1 = 4; % desired max finger press deflection (mm)
-Ff = 2.2; % desired max force at max deflection (N)
+Ff = 2; %2.2; % desired max force at max deflection (N)
 k = 1.138; % spring constant (N/mm)
 
 syms L2 d2; % distance from spring to pivot (mm) and deflection of spring (mm)
@@ -18,7 +18,7 @@ Y = solve([eqn1,eqn2]);
 
 L2 = 60.55; % distance from spring to pivot (mm)
 d1 = 4; % desired max finger press deflection (mm)
-Ff = 2.2; % desired max force at max deflection (N)
+Ff = 2; % desired max force at max deflection (N)
 k = 1.138; % spring constant (N/mm)
 
 syms L1 d2; % distance from spring to finger (mm) and deflection of spring (mm)

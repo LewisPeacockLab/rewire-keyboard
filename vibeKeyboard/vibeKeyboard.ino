@@ -1,23 +1,20 @@
 #include <algorithm>
 #include <math.h>
 
-// #include "AudioSampleCashregister.h"
-
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SerialFlash.h>
-#include "AudioSampleCashregister.h"
-#include "AudioSampleKick.h"
-#include "AudioSampleSnare.h"
-#include "AudioSampleGong.h"
+
+#include "AudioSample_250_20_firstwav.h"
+#include "AudioSample_250_20_secondwav.h"
 
 // audio output
 AudioPlayMemory          playWav1;
+AudioPlayMemory          playWav2;
 AudioOutputAnalogStereo  audioOutput;
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
-// AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
-AudioConnection          patchCord2(playWav1, 0, audioOutput, 1);
+AudioConnection          patchCord2(playWav2, 0, audioOutput, 1);
 
 // analog read
 const int NUM_BUTTONS = 4;
@@ -83,12 +80,14 @@ void loop() {
     if (forceValues[i] > 2000)
       {
         activeStatus[i] = true;
-        digitalWrite(shutdownPins[i], HIGH);
+        // shutdown disabled
+        // digitalWrite(shutdownPins[i], HIGH);
       }
     else
       {
         activeStatus[i] = false;
-        digitalWrite(shutdownPins[i], LOW);
+        // shutdown disabled
+        // digitalWrite(shutdownPins[i], LOW);
       }
 
     forceVoltages[i] = MAX_ANALOG_VOLTAGE*(float)forceValues[i]/float(MAX_ANALOG_VALUE);
@@ -104,7 +103,8 @@ void loop() {
       if (!toneLatches[0])
         {
           // analogWrite(vibePins[0], sinmagnitude);
-          playWav1.play(AudioSampleCashregister);
+          playWav1.play(AudioSample_250_20_secondwav);
+          playWav2.play(AudioSample_250_20_firstwav);
           toneLatches[0] = true;
           delay(200);
         }
@@ -122,7 +122,8 @@ void loop() {
     {
       if (!toneLatches[1])
         {
-          playWav1.play(AudioSampleKick);
+          playWav1.play(AudioSample_250_20_firstwav);
+          playWav2.play(AudioSample_250_20_secondwav);
           toneLatches[1] = true;
           delay(200);
         }
