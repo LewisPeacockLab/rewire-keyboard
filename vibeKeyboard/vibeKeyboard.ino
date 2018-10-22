@@ -46,6 +46,11 @@ bool toneLatches[] = {false, false};
 int shutdownPins[] = {28, 27, 26, 25};
 bool activeStatus[] = {false, false, false, false};
 
+// serial communication variables
+bool stimConditions[] = {false, false};
+char serialMessage;
+char serialMessageCodes[] = {'a', 'b'};
+
 // vibrator output params
 float phase = 0.0;
 float twopi = 3.14159 * 2;
@@ -71,9 +76,23 @@ void setup() {
   // audio
   AudioMemory(12);
 
+  // serial communication
+  Serial.begin(9600);
+
 }
 
 void loop() {
+  // checking serial
+  if (Serial.available())
+    {
+      serialMessage = Serial.read();
+      for (int i=0; i<2; i++){
+        if (serialMessage == serialMessageCodes[i])
+          {
+            stimConditions[i] = true;
+          }
+      }
+    }
 
   for (int i=0; i<NUM_BUTTONS; i++){
     forceValues[i] = analogRead(forcePins[i]);
@@ -98,8 +117,11 @@ void loop() {
     forceOutValues[i] = (int)max(0,min(forceOutValues[i],MAX_ANALOG_OUT));
   }
 
-  if (activeStatus[0] || activeStatus[2])
+  // if (activeStatus[0] || activeStatus[2])
+  // testing serial
+  if (stimConditions[0])
     {
+      stimConditions[0] = false;
       if (!toneLatches[0])
         {
           // analogWrite(vibePins[0], sinmagnitude);
@@ -118,8 +140,11 @@ void loop() {
         }
     }
 
-  if (activeStatus[1] || activeStatus[3])
+  // if (activeStatus[1] || activeStatus[3])
+  // testing serial
+  if (stimConditions[1])
     {
+      stimConditions[1] = false;
       if (!toneLatches[1])
         {
           playWav1.play(AudioSample_250_20_firstwav);

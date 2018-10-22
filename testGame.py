@@ -1,5 +1,6 @@
 import pygame
-import sys
+import serial
+import sys, glob
 
 class testGame(object):
 
@@ -28,6 +29,10 @@ class testGame(object):
         self.key_down_force_ratio = 0.2
         self.key_up_force_ratio = 0.15
 
+        # sending to teensy
+        self.teensy_device = glob.glob('/dev/tty.*usb*')[0]
+        self.teensy = serial.Serial(self.teensy_device)
+
     def check_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -41,6 +46,8 @@ class testGame(object):
                 if event.key == pygame.K_ESCAPE: self.quit()
                 if event.key == pygame.K_s: self.mode = 'switch'
                 if event.key == pygame.K_f: self.mode = 'force'
+                if event.key == pygame.K_a: self.teensy.write('a')
+                if event.key == pygame.K_b: self.teensy.write('b')
             elif event.type == pygame.KEYUP:
                 if self.mode == 'switch':
                     if event.key == pygame.K_1: self.keydown[0] = False
