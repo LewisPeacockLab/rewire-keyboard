@@ -21,7 +21,7 @@ const int NUM_BUTTONS = 4;
 float MAX_ANALOG_VOLTAGE = 3.3;
 int MAX_ANALOG_VALUE = 8192;
 int ANALOG_READ_RESOLUTION = 13;
-float VOLTAGE_AT_MIN_FORCE[] = {0.3, 0.3, 0.3, 0.3};
+float VOLTAGE_AT_MIN_FORCE[] = {0.62, 0.65, 0.6, 0.6};
 float VOLTAGE_AT_MAX_FORCE[] = {3.3, 3.3, 3.3, 3.3};
 float MAX_FORCE = 14.709975; // newtons
 int MAX_ANALOG_OUT = 1023;
@@ -39,17 +39,19 @@ int forceOutValues[NUM_BUTTONS];
 // analog write
 int ANALOG_WRITE_RESOLUTION = 12;
 
-// declare output pins
-int vibePins[] = {A21, A22};
-bool toneLatches[] = {false, false};
+bool toneLatches[] = {false, false, false};
 
 int shutdownPins[] = {28, 27, 26, 25};
 bool activeStatus[] = {false, false, false, false};
 
 // serial communication variables
-bool stimConditions[] = {false, false};
-char serialMessage;
-char serialMessageCodes[] = {'a', 'b'};
+char fingerMessage;
+char timingMessage;
+bool incomingStim = false;
+int numFingerConditions = 3;
+int numTimingConditions = 3;
+char fingerMessageCodes[] = {'0', '1', '2'};
+char timingMessageCodes[] = {'0', '1', '2'};
 
 // vibrator output params
 float phase = 0.0;
@@ -64,8 +66,6 @@ float sinoffset = sinoffsetratio * pow(2,ANALOG_WRITE_RESOLUTION);
 void setup() {
   analogReadResolution(ANALOG_READ_RESOLUTION);
   analogWriteResolution(ANALOG_WRITE_RESOLUTION);
-  pinMode(vibePins[0], OUTPUT);
-  pinMode(vibePins[1], OUTPUT);
 
   // initialize the digital output pins:
   for (int i=0; i<NUM_BUTTONS; i++){
@@ -82,33 +82,10 @@ void setup() {
 }
 
 void loop() {
-  // checking serial
-  if (Serial.available())
-    {
-      serialMessage = Serial.read();
-      for (int i=0; i<2; i++){
-        if (serialMessage == serialMessageCodes[i])
-          {
-            stimConditions[i] = true;
-          }
-      }
-    }
 
+  // force outputs
   for (int i=0; i<NUM_BUTTONS; i++){
     forceValues[i] = analogRead(forcePins[i]);
-    if (forceValues[i] > 2000)
-      {
-        activeStatus[i] = true;
-        // shutdown disabled
-        // digitalWrite(shutdownPins[i], HIGH);
-      }
-    else
-      {
-        activeStatus[i] = false;
-        // shutdown disabled
-        // digitalWrite(shutdownPins[i], LOW);
-      }
-
     forceVoltages[i] = MAX_ANALOG_VOLTAGE*(float)forceValues[i]/float(MAX_ANALOG_VALUE);
     forceNewtons[i] = {MAX_FORCE*(forceVoltages[i]-VOLTAGE_AT_MIN_FORCE[i])
       /(VOLTAGE_AT_MAX_FORCE[i]-VOLTAGE_AT_MIN_FORCE[i])};
@@ -117,53 +94,74 @@ void loop() {
     forceOutValues[i] = (int)max(0,min(forceOutValues[i],MAX_ANALOG_OUT));
   }
 
-  // if (activeStatus[0] || activeStatus[2])
-  // testing serial
-  if (stimConditions[0])
-    {
-      stimConditions[0] = false;
-      if (!toneLatches[0])
-        {
-          // analogWrite(vibePins[0], sinmagnitude);
-          playWav1.play(AudioSample_250_20_secondwav);
-          playWav2.play(AudioSample_250_20_firstwav);
-          toneLatches[0] = true;
-          delay(200);
-        }
-    }
-  else
-    {
-      if (toneLatches[0])
-        {
-          // analogWrite(vibePins[0], 0);
-          toneLatches[0] = false;
-        }
-    }
-
-  // if (activeStatus[1] || activeStatus[3])
-  // testing serial
-  if (stimConditions[1])
-    {
-      stimConditions[1] = false;
-      if (!toneLatches[1])
-        {
-          playWav1.play(AudioSample_250_20_firstwav);
-          playWav2.play(AudioSample_250_20_secondwav);
-          toneLatches[1] = true;
-          delay(200);
-        }
-    }
-  else
-    {
-      if (toneLatches[1])
-        {
-          toneLatches[1] = false;
-        }
-    }
-
   Joystick.X(forceOutValues[0]);
   Joystick.Y(forceOutValues[1]);
   Joystick.Z(forceOutValues[2]);
   Joystick.Zrotate(forceOutValues[3]);
+
+  // checking serial
+  if (Serial.available() > 1)
+    {
+      fingerMessage = Serial.read();
+      timingMessage = Serial.read();
+      incomingStim = true;
+      for (int fingerCondition=0; fingerCondition<numFingerConditions; fingerCondition++){
+        if (fingerMessage == fingerMessageCodes[fingerCondition])
+          {
+            fingerMessage = fingerCondition;
+            break;
+          }
+        }
+      for (int timingCondition=0; timingCondition<numTimingConditions; timingCondition++){
+        if (timingMessage == timingMessageCodes[timingCondition])
+          {
+            timingMessage = timingCondition;
+            break;
+          }
+        }
+    }
+
+  // stims
+  if (incomingStim == true)
+    {
+      incomingStim = false;
+      switch (fingerMessage)
+        {
+          case 0:
+            digitalWrite(shutdownPins[0], HIGH);
+            digitalWrite(shutdownPins[1], HIGH);
+            digitalWrite(shutdownPins[2], LOW);
+            digitalWrite(shutdownPins[3], LOW);
+            break;
+          case 1:
+            digitalWrite(shutdownPins[0], LOW);
+            digitalWrite(shutdownPins[1], HIGH);
+            digitalWrite(shutdownPins[2], HIGH);
+            digitalWrite(shutdownPins[3], LOW);
+            break;
+          case 2:
+            digitalWrite(shutdownPins[0], LOW);
+            digitalWrite(shutdownPins[1], LOW);
+            digitalWrite(shutdownPins[2], HIGH);
+            digitalWrite(shutdownPins[3], HIGH);
+            break;
+        }
+        switch (timingMessage)
+        {
+          case 0:
+            playWav1.play(AudioSample_250_20_secondwav);
+            playWav2.play(AudioSample_250_20_firstwav);
+            break;
+          case 1:
+            playWav1.play(AudioSample_250_20_secondwav);
+            playWav2.play(AudioSample_250_20_firstwav);
+            break;
+          case 2:
+            playWav1.play(AudioSample_250_20_secondwav);
+            playWav2.play(AudioSample_250_20_firstwav);
+            break;
+        }
+
+    }
 
 }

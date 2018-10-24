@@ -23,7 +23,6 @@ class testGame(object):
         self.KEY_PRESS_WIDTH = 0.025*self.SCREEN_HEIGHT
 
         # initialize logic
-        self.mode = 'switch' # or 'force'
         self.keydown = [False,False,False,False]
         self.force_ratio = [0,0,0,0]
         self.key_down_force_ratio = 0.2
@@ -38,28 +37,17 @@ class testGame(object):
             if event.type == pygame.QUIT:
                 self.quit()
             elif event.type == pygame.KEYDOWN:
-                if self.mode == 'switch':
-                    if event.key == pygame.K_1: self.keydown[0] = True
-                    if event.key == pygame.K_2: self.keydown[1] = True
-                    if event.key == pygame.K_3: self.keydown[2] = True
-                    if event.key == pygame.K_4: self.keydown[3] = True
                 if event.key == pygame.K_ESCAPE: self.quit()
-                if event.key == pygame.K_s: self.mode = 'switch'
-                if event.key == pygame.K_f: self.mode = 'force'
-                if event.key == pygame.K_a: self.teensy.write('a')
-                if event.key == pygame.K_b: self.teensy.write('b')
+                if event.key == pygame.K_a: self.teensy.write('00')
+                if event.key == pygame.K_b: self.teensy.write('10')
+                if event.key == pygame.K_c: self.teensy.write('20')
             elif event.type == pygame.KEYUP:
-                if self.mode == 'switch':
-                    if event.key == pygame.K_1: self.keydown[0] = False
-                    if event.key == pygame.K_2: self.keydown[1] = False
-                    if event.key == pygame.K_3: self.keydown[2] = False
-                    if event.key == pygame.K_4: self.keydown[3] = False
+                pass
         for key in range(4):
             self.force_ratio[key] = max(0,min(.5*(1+self.force_keyboard.get_axis(key)),1))
-            if self.mode == 'force':
-                if not(self.keydown[key]) and (self.force_ratio[key] >= self.key_down_force_ratio):
-                    self.keydown[key] = True
-                if self.keydown[key] and (self.force_ratio[key] <= self.key_up_force_ratio):
+            if not(self.keydown[key]) and (self.force_ratio[key] >= self.key_down_force_ratio):
+                self.keydown[key] = True
+            if self.keydown[key] and (self.force_ratio[key] <= self.key_up_force_ratio):
                     self.keydown[key] = False
 
     def run(self):
