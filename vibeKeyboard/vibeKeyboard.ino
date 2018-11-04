@@ -5,16 +5,13 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SerialFlash.h>
-
-#include "AudioSample_250_20_firstwav.h"
-#include "AudioSample_250_20_secondwav.h"
+#include <SD.h>
 
 // audio output
-AudioPlayMemory          playWav1;
-AudioPlayMemory          playWav2;
+AudioPlaySdWav           playWav1;
 AudioOutputAnalogStereo  audioOutput;
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
-AudioConnection          patchCord2(playWav2, 0, audioOutput, 1);
+AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 
 // analog read
 const int NUM_BUTTONS = 4;
@@ -36,36 +33,24 @@ float forceVoltages[NUM_BUTTONS];
 float forceNewtons[NUM_BUTTONS];
 int forceOutValues[NUM_BUTTONS];
 
-// analog write
-int ANALOG_WRITE_RESOLUTION = 12;
-
-bool toneLatches[] = {false, false, false};
-
+// control of tones and shutdown pins
 int shutdownPins[] = {28, 27, 26, 25};
 bool activeStatus[] = {false, false, false, false};
 
 // serial communication variables
 char fingerMessage;
+char orderMessage;
 char timingMessage;
 bool incomingStim = false;
 int numFingerConditions = 3;
-int numTimingConditions = 3;
+int numOrderConditions  = 2;
+int numTimingConditions = 6;
 char fingerMessageCodes[] = {'0', '1', '2'};
-char timingMessageCodes[] = {'0', '1', '2'};
-
-// vibrator output params
-float phase = 0.0;
-float twopi = 3.14159 * 2;
-float frequency = 250.; // Hz
-
-float sinmagnituderatio = 0.1;
-float sinmagnitude = sinmagnituderatio * pow(2,ANALOG_WRITE_RESOLUTION);
-float sinoffsetratio = 0.01;
-float sinoffset = sinoffsetratio * pow(2,ANALOG_WRITE_RESOLUTION);
+char orderMessageCodes[]  = {'0', '1'};
+char timingMessageCodes[] = {'0', '1', '2', '3', '4', '5'};
 
 void setup() {
   analogReadResolution(ANALOG_READ_RESOLUTION);
-  analogWriteResolution(ANALOG_WRITE_RESOLUTION);
 
   // initialize the digital output pins:
   for (int i=0; i<NUM_BUTTONS; i++){
@@ -73,12 +58,18 @@ void setup() {
     digitalWrite(shutdownPins[i], HIGH);
   }
 
-  // audio
-  AudioMemory(12);
-
   // serial communication
   Serial.begin(9600);
 
+  // audio
+  AudioMemory(12);
+  if (!(SD.begin(BUILTIN_SDCARD))) {
+    // stop here, but print a message repetitively
+    while (1) {
+      Serial.println("Unable to access the SD card");
+      delay(500);
+    }
+  }
 }
 
 void loop() {
@@ -100,68 +91,43 @@ void loop() {
   Joystick.Zrotate(forceOutValues[3]);
 
   // checking serial
-  if (Serial.available() > 1)
+  if (Serial.available() > 2)
     {
       fingerMessage = Serial.read();
+      orderMessage = Serial.read();
       timingMessage = Serial.read();
       incomingStim = true;
-      for (int fingerCondition=0; fingerCondition<numFingerConditions; fingerCondition++){
-        if (fingerMessage == fingerMessageCodes[fingerCondition])
-          {
-            fingerMessage = fingerCondition;
-            break;
-          }
-        }
-      for (int timingCondition=0; timingCondition<numTimingConditions; timingCondition++){
-        if (timingMessage == timingMessageCodes[timingCondition])
-          {
-            timingMessage = timingCondition;
-            break;
-          }
-        }
     }
-
-  // stims
   if (incomingStim == true)
     {
       incomingStim = false;
-      switch (fingerMessage)
-        {
-          case 0:
-            digitalWrite(shutdownPins[0], HIGH);
-            digitalWrite(shutdownPins[1], HIGH);
-            digitalWrite(shutdownPins[2], LOW);
-            digitalWrite(shutdownPins[3], LOW);
-            break;
-          case 1:
-            digitalWrite(shutdownPins[0], LOW);
-            digitalWrite(shutdownPins[1], HIGH);
-            digitalWrite(shutdownPins[2], HIGH);
-            digitalWrite(shutdownPins[3], LOW);
-            break;
-          case 2:
-            digitalWrite(shutdownPins[0], LOW);
-            digitalWrite(shutdownPins[1], LOW);
-            digitalWrite(shutdownPins[2], HIGH);
-            digitalWrite(shutdownPins[3], HIGH);
-            break;
-        }
-        switch (timingMessage)
-        {
-          case 0:
-            playWav1.play(AudioSample_250_20_secondwav);
-            playWav2.play(AudioSample_250_20_firstwav);
-            break;
-          case 1:
-            playWav1.play(AudioSample_250_20_secondwav);
-            playWav2.play(AudioSample_250_20_firstwav);
-            break;
-          case 2:
-            playWav1.play(AudioSample_250_20_secondwav);
-            playWav2.play(AudioSample_250_20_firstwav);
-            break;
-        }
-
+      handleStim(fingerMessage, orderMessage, timingMessage);
     }
+}
 
+void handleStim(char fingerMessage, char orderMessage, char timingMessage)
+{
+  // select fingers
+  if (fingerMessage == fingerMessageCodes[0]) {
+    digitalWrite(shutdownPins[0], HIGH);
+    digitalWrite(shutdownPins[1], HIGH);
+    digitalWrite(shutdownPins[2], LOW);
+    digitalWrite(shutdownPins[3], LOW);
+    // add switch logic in here (to concatenate/create stim file name?)
+  }
+  else if (fingerMessage == fingerMessageCodes[1]) {
+    digitalWrite(shutdownPins[0], LOW);
+    digitalWrite(shutdownPins[1], HIGH);
+    digitalWrite(shutdownPins[2], HIGH);
+    digitalWrite(shutdownPins[3], LOW);
+  }
+  else if (fingerMessage == fingerMessageCodes[2]) {
+    digitalWrite(shutdownPins[0], LOW);
+    digitalWrite(shutdownPins[1], LOW);
+    digitalWrite(shutdownPins[2], HIGH);
+    digitalWrite(shutdownPins[3], HIGH);
+  }
+
+  // play audio (remove and put in switching logic)
+  playWav1.play("P500.WAV");
 }

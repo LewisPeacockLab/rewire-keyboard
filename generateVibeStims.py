@@ -1,16 +1,17 @@
 from scipy.io import wavfile
 import numpy as np
 
-sample_rate = 44100.0 # Hz
-max_value = 32767.0 # 16 bit int
+SAMPLE_RATE = 44100.0 # Hz
+MAX_AMPLITUDE = 32767.0 # 16 bit int
 
-def generateStim(stim_duration=0.02, stim_frequency=250, stim_offset=0.1, mode='stereo'):
-    stim_name = str(int(1000*stim_offset))+'_'+str(int(stim_frequency))+'_'+str(int(1000*stim_duration))
+def generateStim(stim_name = 'demo', stim_offset=0.1,
+        stim_duration=0.02, stim_frequency=250, volume=1):
+    amplitude = volume*MAX_AMPLITUDE
     total_duration = stim_duration + np.abs(stim_offset)
-    stim_data = np.zeros((int(total_duration*sample_rate),2),dtype=np.int16)
-    n_stim_points = int(stim_duration*sample_rate)
+    stim_data = np.zeros((int(total_duration*SAMPLE_RATE),2),dtype=np.int16)
+    n_stim_points = int(stim_duration*SAMPLE_RATE)
     stim_time_vector = np.linspace(0, stim_duration, n_stim_points)
-    stim_vector = np.array(max_value*-np.cos(stim_frequency*2*np.pi*stim_time_vector),dtype=np.int16)
+    stim_vector = np.array(amplitude*-np.cos(stim_frequency*2*np.pi*stim_time_vector),dtype=np.int16)
     if stim_offset >= 0:
         first_stim = 0
         second_stim = 1
@@ -19,10 +20,17 @@ def generateStim(stim_duration=0.02, stim_frequency=250, stim_offset=0.1, mode='
         second_stim = 0
     stim_data[:n_stim_points,first_stim] = stim_vector
     stim_data[-n_stim_points:,second_stim] = stim_vector
-    if mode == 'stereo':
-        wavfile.write(stim_name+'.wav', int(sample_rate), stim_data)
-    elif mode == 'mono':
-        wavfile.write(stim_name+'_first.wav', int(sample_rate), stim_data[:,first_stim])
-        wavfile.write(stim_name+'_second.wav', int(sample_rate), stim_data[:,second_stim])
-    else:
-        print 'invalid mode (please select mono or stereo)'
+    wavfile.write(stim_name+'.wav', int(SAMPLE_RATE), stim_data)
+
+################
+# stim routing #
+################
+
+#    0   1   2    <-- finger pairs
+# CH1 CH2 CH1 CH2 <-- channels
+#
+# order:  0 (left first), 1 (right first)
+#
+# timing: 0, ..., N (e.g. 7 different timings)
+#
+# finger pairs 0 & 2 normal, pair 1 needs a flip
