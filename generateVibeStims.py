@@ -20,17 +20,15 @@ def generateStim(stim_name = 'demo', stim_offset=0.1,
         second_stim = 0
     stim_data[:n_stim_points,first_stim] = stim_vector
     stim_data[-n_stim_points:,second_stim] = stim_vector
-    wavfile.write(stim_name+'.wav', int(SAMPLE_RATE), stim_data)
+    wavfile.write(stim_name+'.WAV', int(SAMPLE_RATE), stim_data)
 
-################
-# stim routing #
-################
+def generateMultiStim(timing_array = [.03, .07, .12, .18, .25, .4],
+        stim_duration=.02, stim_frequency=250, volume=1):
+    for idx, timing in enumerate(timing_array):
+        stim_offset = timing_array[idx]
+        stim_name = 'P'+str(idx)
+        generateStim(stim_name, stim_offset, stim_duration, stim_frequency, volume)
+        stim_offset = -timing_array[idx]
+        stim_name = 'N'+str(idx)
+        generateStim(stim_name, stim_offset, stim_duration, stim_frequency, volume)
 
-#    0   1   2    <-- finger pairs
-# CH1 CH2 CH1 CH2 <-- channels
-#
-# order:  0 (left first), 1 (right first)
-#
-# timing: 0, ..., N (e.g. 7 different timings)
-#
-# finger pairs 0 & 2 normal, pair 1 needs a flip

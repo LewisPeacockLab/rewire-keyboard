@@ -8,10 +8,10 @@
 #include <SD.h>
 
 // audio output
-AudioPlaySdWav           playWav1;
+AudioPlaySdWav           playWav;
 AudioOutputAnalogStereo  audioOutput;
-AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
-AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
+AudioConnection          patchCord1(playWav, 0, audioOutput, 0);
+AudioConnection          patchCord2(playWav, 1, audioOutput, 1);
 
 // analog read
 const int NUM_BUTTONS = 4;
@@ -33,9 +33,8 @@ float forceVoltages[NUM_BUTTONS];
 float forceNewtons[NUM_BUTTONS];
 int forceOutValues[NUM_BUTTONS];
 
-// control of tones and shutdown pins
+// control of shutdown pins
 int shutdownPins[] = {28, 27, 26, 25};
-bool activeStatus[] = {false, false, false, false};
 
 // serial communication variables
 char fingerMessage;
@@ -46,8 +45,9 @@ int numFingerConditions = 3;
 int numOrderConditions  = 2;
 int numTimingConditions = 6;
 char fingerMessageCodes[] = {'0', '1', '2'};
-char orderMessageCodes[]  = {'0', '1'};
+char orderMessageCodes[]  = {'P', 'N'};
 char timingMessageCodes[] = {'0', '1', '2', '3', '4', '5'};
+char wavFileName[] = "P0.WAV";
 
 void setup() {
   analogReadResolution(ANALOG_READ_RESOLUTION);
@@ -107,19 +107,25 @@ void loop() {
 
 void handleStim(char fingerMessage, char orderMessage, char timingMessage)
 {
-  // select fingers
+  // select stimulators based on finger message
   if (fingerMessage == fingerMessageCodes[0]) {
     digitalWrite(shutdownPins[0], HIGH);
     digitalWrite(shutdownPins[1], HIGH);
     digitalWrite(shutdownPins[2], LOW);
     digitalWrite(shutdownPins[3], LOW);
-    // add switch logic in here (to concatenate/create stim file name?)
   }
   else if (fingerMessage == fingerMessageCodes[1]) {
     digitalWrite(shutdownPins[0], LOW);
     digitalWrite(shutdownPins[1], HIGH);
     digitalWrite(shutdownPins[2], HIGH);
     digitalWrite(shutdownPins[3], LOW);
+    // for center finger pair, need to flip the sign
+    if (orderMessage == orderMessageCodes[0]) {
+      orderMessage = orderMessageCodes[1]
+    }
+    else if (orderMessage == orderMessageCodes[1]) {
+      orderMessage = orderMessageCodes[0]
+    }
   }
   else if (fingerMessage == fingerMessageCodes[2]) {
     digitalWrite(shutdownPins[0], LOW);
@@ -128,6 +134,8 @@ void handleStim(char fingerMessage, char orderMessage, char timingMessage)
     digitalWrite(shutdownPins[3], HIGH);
   }
 
-  // play audio (remove and put in switching logic)
-  playWav1.play("P500.WAV");
+  // play audio
+  wavFileName[0] = orderMessage;
+  wavFileName[1] = timingMessage;
+  playWav.play(wavFileName);
 }
