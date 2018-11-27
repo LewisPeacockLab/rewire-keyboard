@@ -1,17 +1,20 @@
 import pygame
 import serial
 import sys, glob
+from keyboardClass import rewireKeyboard
 
 class testGame(object):
 
-    def __init__(self):
+    def __init__(self, max_key_force=2.):
         # initialize pygame and graphics
         pygame.init()
-        self.force_keyboard = pygame.joystick.Joystick(0)
-        self.force_keyboard.init()
+        self.max_key_force = max_key_force
+        self.pygame_keyboard = pygame.joystick.Joystick(0)
         self.clock = pygame.time.Clock()
         self.FRAME_RATE = 60
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = 800, 800
+        # keyboard must be declared BEFORE screen initialized
+        self.keyboard = rewireKeyboard(self.pygame_keyboard)
         self.screen = pygame.display.set_mode(
             (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.BG_COLOR = 40,40,40
@@ -22,17 +25,8 @@ class testGame(object):
         self.KEY_WIDTH = 0.15*self.SCREEN_HEIGHT
         self.KEY_PRESS_WIDTH = 0.025*self.SCREEN_HEIGHT
 
-        # initialize logic
-        self.keydown = [False,False,False,False]
-        self.force_ratio = [0,0,0,0]
-        self.key_down_force_ratio = 0.2
-        self.key_up_force_ratio = 0.15
-
-        # sending to teensy
-        self.teensy_device = glob.glob('/dev/tty.*usb*')[0]
-        self.teensy = serial.Serial(self.teensy_device)
-
     def check_input(self):
+        self.keyboard.update_inputs()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
@@ -41,14 +35,9 @@ class testGame(object):
                 if event.key == pygame.K_a: self.teensy.write('00')
                 if event.key == pygame.K_b: self.teensy.write('10')
                 if event.key == pygame.K_c: self.teensy.write('20')
+                if event.key == pygame.K_z: self.keyboard.set_zero_force()
             elif event.type == pygame.KEYUP:
                 pass
-        for key in range(4):
-            self.force_ratio[key] = max(0,min(.5*(1+self.force_keyboard.get_axis(key)),1))
-            if not(self.keydown[key]) and (self.force_ratio[key] >= self.key_down_force_ratio):
-                self.keydown[key] = True
-            if self.keydown[key] and (self.force_ratio[key] <= self.key_up_force_ratio):
-                    self.keydown[key] = False
 
     def run(self):
         while True:
@@ -60,7 +49,7 @@ class testGame(object):
             pygame.display.flip()
 
     def draw_key(self,key_num,xpos):
-        if self.keydown[key_num]:
+        if self.keyboard.keydown[key_num]:
             draw_center_rect(self.screen,
                          self.KEY_WIDTH+self.KEY_PRESS_WIDTH,
                          self.KEY_HEIGHT+self.KEY_PRESS_WIDTH,
@@ -75,7 +64,8 @@ class testGame(object):
                      0.5*self.SCREEN_HEIGHT)
         draw_bottom_rect(self.screen,
              self.KEY_WIDTH,
-             self.force_ratio[key_num]*self.KEY_HEIGHT,
+             # self.keyboard.force_ratio[key_num]*self.KEY_HEIGHT,
+             self.keyboard.force[key_num]/self.max_key_force*self.KEY_HEIGHT,
              self.KEY_FORCE_COLOR,
              .5*self.SCREEN_WIDTH+xpos,
              0.5*self.SCREEN_HEIGHT+0.5*self.KEY_HEIGHT) 
