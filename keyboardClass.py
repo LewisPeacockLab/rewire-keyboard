@@ -6,7 +6,7 @@ class rewireKeyboard(object):
 
     def __init__(self, pygame_keyboard, full_range_force=2.,
             key_down_force=0.4, key_up_force=0.3, min_key_force=0.1,
-            num_keys=4, time_history_points=100):
+            num_keys=4, time_history_points=50):
         self.pygame_keyboard = pygame_keyboard
         self.pygame_keyboard.init()
 
