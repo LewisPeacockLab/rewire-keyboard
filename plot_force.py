@@ -2,15 +2,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-file_id = '1545446890'
+file_id = '1547177090'
 
 df = pd.read_csv('log_'+file_id+'.csv')
 df = df[1:] # dropping first 'empty' frame
 df['time'] = np.cumsum(df.time_passed)
 
-start_time = 0
-end_time = 5
-frame_rate = 60.
+# start_time = np.min(df.time)
+# end_time = np.max(df.time)
+start_time = 1.
+end_time = 1.2
+frame_rate = 1000. #60.
 
 t = np.arange(start_time, end_time, 1/frame_rate)
 
