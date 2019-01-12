@@ -10,7 +10,7 @@ class forceRecorder(object):
         self.max_key_force = max_key_force
         self.pygame_keyboard = pygame.joystick.Joystick(0)
         self.clock = pygame.time.Clock()
-        self.FRAME_RATE = 1000.
+        self.FRAME_RATE = 250. #1000.
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = 20, 20
         # keyboard must be declared BEFORE screen initialized
         self.keyboard = rewireKeyboard(self.pygame_keyboard)
@@ -50,8 +50,8 @@ class forceRecorder(object):
             self.check_input()
             if self.recording_bool:
                 self.record_force(time_passed)
-            self.draw_background()
-            pygame.display.flip()
+            # self.draw_background()
+            # pygame.display.flip()
 
     def draw_background(self):
         if self.recording_bool:

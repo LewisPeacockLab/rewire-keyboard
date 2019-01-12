@@ -2,17 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-file_id = '1547177090'
+file_id = 'mri_noise_floor'
 
 df = pd.read_csv('log_'+file_id+'.csv')
-df = df[1:] # dropping first 'empty' frame
 df['time'] = np.cumsum(df.time_passed)
 
-# start_time = np.min(df.time)
-# end_time = np.max(df.time)
-start_time = 1.
-end_time = 1.2
-frame_rate = 1000. #60.
+start_time = np.min(df.time)
+end_time = np.max(df.time)
+frame_rate = 250. #60.
 
 t = np.arange(start_time, end_time, 1/frame_rate)
 
@@ -28,3 +25,36 @@ plt.plot(t, y_0_interp)
 plt.plot(t, y_1_interp)
 plt.plot(t, y_2_interp)
 plt.plot(t, y_3_interp)
+
+####################
+# signal filtering #
+####################
+from scipy import signal
+
+Fs = 250.
+Wn = 10.
+Wn_rad = Wn/Fs*2
+
+b,a = signal.butter(4, Wn_rad, 'lowpass')
+
+y_0_filt = signal.lfilter(b,a,y_0_interp)
+
+################
+# FFT analysis #
+################
+
+Fs = 250.
+y = y_0_filt
+y = y-np.mean(y)
+n = len(y) # length of the signal
+k = np.arange(n)
+T = n/Fs
+frq = k/T # two sides frequency range
+frq = frq[range(n/2)] # one side frequency range
+
+Y = np.fft.fft(y)/n # fft computing and normalization
+Y = Y[range(n/2)]
+
+plt.plot(frq,abs(Y),'r') # plotting the spectrum
+plt.xlabel('Freq (Hz)')
+plt.ylabel('|Y(freq)|')
