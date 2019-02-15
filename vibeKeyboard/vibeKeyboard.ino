@@ -121,10 +121,10 @@ void handleStim(char fingerMessage, char orderMessage, char timingMessage)
     digitalWrite(shutdownPins[3], LOW);
     // for center finger pair, need to flip the sign
     if (orderMessage == orderMessageCodes[0]) {
-      orderMessage = orderMessageCodes[1]
+      orderMessage = orderMessageCodes[1];
     }
     else if (orderMessage == orderMessageCodes[1]) {
-      orderMessage = orderMessageCodes[0]
+      orderMessage = orderMessageCodes[0];
     }
   }
   else if (fingerMessage == fingerMessageCodes[2]) {
@@ -137,5 +137,6 @@ void handleStim(char fingerMessage, char orderMessage, char timingMessage)
   // play audio
   wavFileName[0] = orderMessage;
   wavFileName[1] = timingMessage;
+
   playWav.play(wavFileName);
 }
