@@ -164,6 +164,10 @@ class testGame(object):
                     self.set_target_finger(2)
                 if event.key == pygame.K_4:
                     self.set_target_finger(3)
+                if event.key == pygame.K_q: self.keyboard.send_stimulus('0P2')
+                if event.key == pygame.K_w: self.keyboard.send_stimulus('0N2')
+                if event.key == pygame.K_e: self.keyboard.send_stimulus('0P4')
+                if event.key == pygame.K_r: self.keyboard.send_stimulus('0N4')
                 if event.key == pygame.K_a: self.keyboard.send_stimulus('0P0')
                 if event.key == pygame.K_b: self.keyboard.send_stimulus('1P0')
                 if event.key == pygame.K_c: self.keyboard.send_stimulus('2P0')

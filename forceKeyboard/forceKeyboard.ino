@@ -13,6 +13,7 @@ int ANALOG_READ_RESOLUTION = 13;
 // int MAX_ANALOG_OUT = 1023;
 // float MAX_FORCE_OUT = 0.3; // newtons
 float VOLTAGE_AT_MIN_FORCE[] = {0.79, 0.64, 0.67, 0.65};
+// float VOLTAGE_AT_MIN_FORCE[] = {0.59, 0.44, 0.47, 0.45};
 float VOLTAGE_AT_MAX_FORCE = 3.3;
 float MAX_FORCE = 14.709975; // newtons
 int MAX_ANALOG_OUT = 1023;

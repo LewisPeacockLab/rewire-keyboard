@@ -22,14 +22,14 @@ class forceRecorder(object):
 
         # force recording
         self.recording_bool = False
-        self.force_file = open('logs/log_'+str(int(time.time()))+'.csv','w')
-        self.force_file.write('time_passed,')
-        for finger in range(4):
-            self.force_file.write('force_'+str(finger))
-            if finger < 3:
-                self.force_file.write(',')
-            else:
-                self.force_file.write('\n')
+        # self.force_file = open('logs/log_'+str(int(time.time()))+'.csv','w')
+        # self.force_file.write('time_passed,')
+        # for finger in range(4):
+        #     self.force_file.write('force_'+str(finger))
+        #     if finger < 3:
+        #         self.force_file.write(',')
+        #     else:
+        #         self.force_file.write('\n')
 
     def check_input(self):
         self.keyboard.update_inputs()
@@ -38,8 +38,11 @@ class forceRecorder(object):
                 self.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: self.quit()
-                if event.key == pygame.K_r:
-                    self.recording_bool = not(self.recording_bool)
+                if event.key == pygame.K_SPACE:
+                    if not(self.recording_bool):
+                        self.start_recording()
+                    else:
+                        self.stop_recording()
                 if event.key == pygame.K_z: self.keyboard.set_zero_force()
             elif event.type == pygame.KEYUP:
                 pass
@@ -68,6 +71,20 @@ class forceRecorder(object):
                 self.force_file.write(',')
             else:
                 self.force_file.write('\n')
+
+    def start_recording(self):
+        self.force_file = open('logs/log_'+str(int(time.time()))+'.csv','w')
+        self.recording_bool = True
+        self.force_file.write('time_passed,')
+        for finger in range(4):
+            self.force_file.write('force_'+str(finger))
+            if finger < 3:
+                self.force_file.write(',')
+            else:
+                self.force_file.write('\n')
+
+    def stop_recording(self):
+        self.recording_bool = False
 
     def quit(self):
         sys.exit()

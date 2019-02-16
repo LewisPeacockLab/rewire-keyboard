@@ -10,13 +10,12 @@ float VOLTAGE_AT_MIN_FORCE[] = {0.0, 0.0, 0.0, 0.0};
 float VOLTAGE_AT_MAX_FORCE[] = {3.3, 3.3, 3.3, 3.3};
 float MAX_FORCE = 15.0; // newtons
 int MAX_ANALOG_OUT = 1023;
-// float MAX_FORCE_OUT = 8.0; // newtons
+float MAX_FORCE_OUT = 5.0; // newtons
 // float MAX_FORCE_OUT = 15.0; // newtons
-float MAX_FORCE_OUT = 2.0; // newtons
+// float MAX_FORCE_OUT = 2.0; // newtons
 
 // declare input pins
-// int forcePins[] = {A16, A20, A0, A4};
-int forcePins[] = {A12, A13, A14, A15};
+int forcePins[] = {A13, A12, A14, A15};
  
 // force input params
 int forceValues[NUM_BUTTONS];

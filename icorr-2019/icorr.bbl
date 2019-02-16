@@ -1,0 +1,61 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{#1}
+\csname url@rmstyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand\BIBentrySTDinterwordspacing{\spaceskip=0pt\relax}
+\providecommand\BIBentryALTinterwordstretchfactor{4}
+\providecommand\BIBentryALTinterwordspacing{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand\BIBforeignlanguage[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+
+\bibitem{wiestler2013skill}
+T.~Wiestler and J.~Diedrichsen, ``Skill learning strengthens cortical
+  representations of motor sequences,'' \emph{Elife}, vol.~2, 2013.
+
+\bibitem{ejaz2015hand}
+N.~Ejaz, M.~Hamada, and J.~Diedrichsen, ``Hand use predicts the structure of
+  representations in sensorimotor cortex,'' \emph{Nature neuroscience},
+  vol.~18, no.~7, p. 1034, 2015.
+
+\bibitem{ejaz2018evidence}
+N.~Ejaz, J.~Xu, M.~Branscheidt, B.~Hertler, H.~Schambra, M.~Widmer, A.~V.
+  Faria, M.~D. Harran, J.~C. Cortes, N.~Kim, \emph{et~al.}, ``Evidence for a
+  subcortical origin of mirror movements after stroke: a longitudinal study,''
+  \emph{Brain}, vol. 141, no.~3, pp. 837--847, 2018.
+
+\bibitem{arata2013mri}
+J.~Arata, S.~Terakawa, J.~Sulzer, R.~Gassert, and H.~Fujimoto,
+  ``{MRI}-compatible grasping force sensor with an inclined double parallel
+  structure using fiber optics,'' \emph{Transactions of the Institute of
+  Systems, Control and Information Engineers}, vol.~26, no.~3, pp. 110--116,
+  2013.
+
+\bibitem{butzer2015design}
+T.~B{\"u}tzer, B.~Vigaru, and R.~Gassert, ``Design and evaluation of a compact,
+  integrated {fMRI}-compatible force sensor printed by additive
+  manufacturing,'' in \emph{World Haptics Conference (WHC), 2015 IEEE}.\hskip
+  1em plus 0.5em minus 0.4em\relax IEEE, 2015, pp. 158--164.
+
+\bibitem{han2017mri}
+C.~Han, E.~Oblak, L.~Abraham, P.~Ferrari, M.~McManis, D.~Schnyer, and
+  J.~Sulzer, ``An {MRI}-compatible force sensor for measuring differential
+  isometric precision grip force,'' in \emph{Engineering in Medicine and
+  Biology Society (EMBC), 2017 39th Annual International Conference of the
+  IEEE}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2017, pp. 791--794.
+
+\bibitem{diedrichsen2012two}
+J.~Diedrichsen, T.~Wiestler, and J.~W. Krakauer, ``Two distinct ipsilateral
+  cortical representations for individuated finger movements,'' \emph{Cerebral
+  Cortex}, vol.~23, no.~6, pp. 1362--1377, 2012.
+
+\end{thebibliography}
