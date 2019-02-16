@@ -6,6 +6,7 @@ const int NUM_BUTTONS = 4;
 float MAX_ANALOG_VOLTAGE = 3.3;
 int MAX_ANALOG_VALUE = 8192;
 int ANALOG_READ_RESOLUTION = 13;
+int ANALOG_READ_AVERAGES = 4;
 float VOLTAGE_AT_MIN_FORCE[] = {0.0, 0.0, 0.0, 0.0};
 float VOLTAGE_AT_MAX_FORCE[] = {3.3, 3.3, 3.3, 3.3};
 float MAX_FORCE = 15.0; // newtons
@@ -25,6 +26,7 @@ int forceOutValues[NUM_BUTTONS];
 
 void setup() {
   analogReadResolution(ANALOG_READ_RESOLUTION);
+  analogReadAveraging(ANALOG_READ_AVERAGES);
 }
 
 void loop() {
