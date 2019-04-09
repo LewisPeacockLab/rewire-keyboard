@@ -7,9 +7,20 @@ This is a work-in-progress repository for the force sensitive keyboards used by 
 Each keyboard incorporates 4 force-sensitive buttons and can be used left- or right-handed. There are currently 2 major keyboard types:
 
 - MRI compatible (`mriKeyboard`)
+
+This keyboard consists of 2 components: the keyboard module and the controller module. Standard RJ45 cables are used to transmit force recordings from the keyboard (inside the scanner) to the controller (inside the control room).
+
+![mri-keyboard](./hardware/photos/mri-keyboard-progress.jpg)
+
+Depending on the positioning of the force sensors within/near the scanner, significant high frequency noise can be introduced by the scanner. In these cases, the signals should be passed through RF filters in the scanner room wall.
+
 - non-MRI compatible with vibrotactile stimulators (`vibeKeyboard`)
 
-If vibrotactile stimulation is not required, then a simpler configuration can be used (`forceKeyboard`).
+This keyboard has all components on the same board. It also has a separate 5V power connector and audio amplifiers for the vibrotactile stimulators. 
+
+![mri-keyboard](./hardware/photos/vibe-keyboard-progress.jpg)
+
+If vibrotactile stimulation is not required, then a simpler configuration can be used (`forceKeyboard`). This version does not require external 5V power or installation of audio amplifiers to the main circuit board.
 
 ## Interface
 
