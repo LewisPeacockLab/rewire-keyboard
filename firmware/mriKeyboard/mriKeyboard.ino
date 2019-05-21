@@ -8,13 +8,10 @@ int MAX_ANALOG_VALUE = 8192;
 int ANALOG_READ_RESOLUTION = 13;
 int ANALOG_READ_AVERAGES = 4;
 float VOLTAGE_AT_MIN_FORCE[] = {0.0, 0.0, 0.0, 0.0};
-// float VOLTAGE_AT_MAX_FORCE[] = {3.3, 3.3, 3.3, 3.3};
-float VOLTAGE_AT_MAX_FORCE[] = {3.3, 2.0, 2.0, 3.3};
-float MAX_FORCE = 15.0; // newtons
+float VOLTAGE_AT_MAX_FORCE[] = {1.1, 0.55, 0.55, 1.1};
+float MAX_FORCE = 10.7873; // newtons
 int MAX_ANALOG_OUT = 1023;
-float MAX_FORCE_OUT = 5.0; // newtons
-// float MAX_FORCE_OUT = 15.0; // newtons
-// float MAX_FORCE_OUT = 2.0; // newtons
+float MAX_FORCE_OUT = 8.0; // newtons
 
 // declare input pins
 int forcePins[] = {A13, A12, A14, A15};

@@ -18,9 +18,9 @@ const int NUM_BUTTONS = 4;
 float MAX_ANALOG_VOLTAGE = 3.3;
 int MAX_ANALOG_VALUE = 8192;
 int ANALOG_READ_RESOLUTION = 13;
-float VOLTAGE_AT_MIN_FORCE[] = {0.62, 0.65, 0.6, 0.6};
-float VOLTAGE_AT_MAX_FORCE[] = {3.3, 3.3, 3.3, 3.3};
-float MAX_FORCE = 14.709975; // newtons
+float VOLTAGE_AT_MIN_FORCE[] = {0.6, 0.6, 0.6, 0.6};
+float VOLTAGE_AT_MAX_FORCE[] = {1.05, 1.75, 1.75, 1.05};
+float MAX_FORCE = 10.7873; // newtons
 int MAX_ANALOG_OUT = 1023;
 float MAX_FORCE_OUT = 8.0; // newtons
 
